@@ -45,13 +45,13 @@ let
 
   # The timestamp argument is a yyyy-mm-dd-hh-mm-ss date, which corresponds to
   # one specific version. This is used mostly for bisecting.
-  versionInfo = { name, version, release, system ? arch, timestamp ? null, info ? null }: with builtins;
+  versionInfo = { name, version, release, system ? arch, timestamp ? null, info ? null, edition ? "firefox" }: with builtins;
     if (info != null) then info else
     if release then
-      # For versions such as Beta & Release:
+      # For versions such as Developer Edition, Beta & Release:
       # https://download.cdn.mozilla.net/pub/firefox/releases/55.0b3/SHA256SUMS
       let
-        dir = "https://download.cdn.mozilla.net/pub/firefox/releases/${version}";
+        dir = "https://download.cdn.mozilla.net/pub/${edition}/releases/${version}";
         file = "${system}/en-US/firefox-${version}.tar.bz2";
         sha512Of = chksum: file: extractSha512Sum (readFile (fetchurl chksum)) file;
       in rec {
@@ -168,6 +168,12 @@ in
       name = "Firefox Nightly";
       version = firefox_versions.FIREFOX_NIGHTLY;
       release = false;
+    };
+    firefox-devedition-bin = firefoxVersion {
+      name = "Firefox Developer Edition";
+      version = firefox_versions.LATEST_FIREFOX_DEVEL_VERSION;
+      release = true;
+      edition = "devedition";
     };
     firefox-beta-bin = firefoxVersion {
       name = "Firefox Beta";
